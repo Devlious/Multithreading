@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+if [ -f $1'.jar' ]; then
+  rm $1'.jar'
+  echo  $1'.jar file deleted successfully'
+fi
+
+kotlinc $1'.kt' -include-runtime -d $1'.jar'
+
+if [ -f $1'.jar' ]; then 
+  clear
+  echo ':: Compiled Successfully and Running ::'
+  echo ''
+  kotlin $1'.jar'
+fi
