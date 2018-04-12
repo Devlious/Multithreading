@@ -2,57 +2,62 @@ import threading
 import time
 import random
 
-abono = True 
+class self(threading.Thread):
+    acctBalance = 50
+    abono = True
 
-class BankAccount(threading.Thread):
-    acctBalance = 10
-
-    def __init__(self, name):
+    def __init__(self, name, acctBalance):
         threading.Thread.__init__(self)
         self.name = name
+        self.acctBalance = acctBalance
 
     def run(self):
         # Call the static method
-        for _ in range(5):
+        for _ in range(25):
             # print(":: {} ::".format(time.strftime("%H:%M:%S", time.gmtime())))
             if random.randrange(2)+1 == 1:
-                BankAccount.set_money(self)
+                self.set_money()
             else:
-                BankAccount.get_money(self)
+                self.get_money()
 
     def get_money(self):
-        global abono
 
         money_request = random.randrange(100)+1
 
         condition.acquire()
 
-        while BankAccount.acctBalance - money_request < 0 and abono == False:
-            print("{} waiting for money [${}]".format(self.name, money_request))
+        while self.acctBalance - money_request < 0 and self.abono == False:
+            print("~~ {} waiting for money [${}]".format(self.name, money_request))
             condition.wait()
 
         print("- {} tries to withdrawal ${}".format(self.name, money_request))
 
         condition.release()
 
-        BankAccount.acctBalance -= money_request
-        if BankAccount.acctBalance < 0:
-            abono = False
-        print("New account balance is : ${}".format(BankAccount.acctBalance))
+        self.acctBalance -= money_request
+        if self.acctBalance < 0:
+            self.abono = False
+
+        if self.acctBalance >= 0:
+            print("{}'s account balance is : ${}".format(self.name, self.acctBalance))
+        else:
+            print("{}'s account balance is : ${} with debt ${}".format(self.name, 0, -self.acctBalance))
 
         print("\n")
         time.sleep(0.5)
 
     def set_money(self):
-        global abono
         money_request = random.randrange(100)+1
         condition.acquire()
         print("+ {} deposit : ${}".format(self.name, money_request))
 
-        BankAccount.acctBalance += money_request
-        print("New account balance is : ${}".format(BankAccount.acctBalance))
-        if not abono and BankAccount.acctBalance >= 0:
-            abono = True
+        self.acctBalance += money_request
+        if self.acctBalance >= 0:
+            print("{}'s account balance is : ${}".format(self.name, self.acctBalance))
+        else:
+            print("{}'s account balance is : ${} with debt ${}".format(self.name, 0, -self.acctBalance))
+        if not self.abono and self.acctBalance >= 0:
+            self.abono = True
 
         condition.notifyAll()
         condition.release()
@@ -66,7 +71,7 @@ class BankAccount(threading.Thread):
 threadLock = threading.Lock()
 condition = threading.Condition()
 
-threads = [BankAccount("Beto"), BankAccount("Diego"), BankAccount("Lolo")]
+threads = [self("Beto", 100), self("Diego", 200), self("Lolo", 300)]
 
 for t in threads:
     t.start()
