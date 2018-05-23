@@ -71,7 +71,7 @@ class Caja(threading.Thread):
 			namP += 1
 			cntP += 1
 			lenP -= 1
-		
+
 condition = threading.Condition()
 
 for i in range(3):
